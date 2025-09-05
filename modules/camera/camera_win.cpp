@@ -44,6 +44,7 @@ Ref<CameraFeedWindows> CameraFeedWindows::create(IMFActivate *imf_camera_device)
 	wchar_t *camera_id = nullptr;
 	hr = imf_camera_device->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, &camera_id, &len);
 	ERR_FAIL_COND_V_MSG(FAILED(hr), {}, "Unable to get camera id");
+	print_line("cam id: " + String::utf16((const char16_t *)camera_id));
 	feed->device_id = camera_id;
 	CoTaskMemFree(camera_id);
 
@@ -51,13 +52,16 @@ Ref<CameraFeedWindows> CameraFeedWindows::create(IMFActivate *imf_camera_device)
 	wchar_t *camera_name = nullptr;
 	hr = imf_camera_device->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, &camera_name, &len);
 	ERR_FAIL_COND_V_MSG(FAILED(hr), {}, "Unable to get camera name");
+	print_line("cam name: " + String::utf16((const char16_t *)camera_name));
 	feed->name = camera_name;
 	CoTaskMemFree(camera_name);
 
 	// Get media imf_media_source
 	IMFMediaSource *imf_media_source = nullptr;
 	hr = imf_camera_device->ActivateObject(IID_PPV_ARGS(&imf_media_source));
-	ERR_FAIL_COND_V_MSG(FAILED(hr), {}, "Unable to activate device");
+	ERR_FAIL_COND_V_MSG(FAILED(hr), {}, vformat("Unable to activate device. HRESULT: 0x%08ux", (uint64_t)hr));
+	/*ERR_FAIL_COND_V_MSG(FAILED(hr), {}, "Unable to activate device");*/
+
 
 	// Get information about device
 	IMFPresentationDescriptor *imf_presentation_descriptor = nullptr;
@@ -623,6 +627,7 @@ CameraWindows::~CameraWindows() {
 
 void CameraWindows::set_monitoring_feeds(bool p_monitoring_feeds) {
 	monitoring_feeds = p_monitoring_feeds;
+	print_line("set_monitoring_feeds from windows");
 	if (monitoring_feeds) {
 		update_feeds();
 	}

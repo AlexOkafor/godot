@@ -179,6 +179,7 @@ RID CameraServer::feed_texture(int p_id, CameraServer::FeedImage p_texture) {
 
 CameraServer::CameraServer() {
 	singleton = this;
+	print_line("created camera server!");
 }
 
 CameraServer::~CameraServer() {
